@@ -13,7 +13,8 @@ from pokemon import *
 from random_gen import RandomGen
 from stack_adt import ArrayStack
 from queue_adt import CircularQueue
-from array_sorted_list import ArraySortedList, ListItem 
+from array_sorted_list import ArraySortedList, ListItem
+
 
 class Action(Enum):
     """
@@ -23,7 +24,8 @@ class Action(Enum):
     SWAP = auto()
     HEAL = auto()
     SPECIAL = auto()
-    
+
+
 class Criterion(Enum):
     """
     This is the class of Criterion, the members are SPD, HP, LV and DEF.
@@ -32,6 +34,7 @@ class Criterion(Enum):
     HP = auto()
     LV = auto()
     DEF = auto()
+
 
 class PokeTeam:
     """
@@ -56,9 +59,10 @@ class PokeTeam:
     BASE_POKEMON = [Charmander, Bulbasaur, Squirtle, Gastly, Eevee]
     POKEDEX_ORDERING = [Charmander, Charizard, Bulbasaur, Venusaur, Squirtle, Blastoise, Gastly, Haunter, Gengar, Eevee]
 
-    def __init__(self, team_name: str, team_numbers: list[int], battle_mode: int, ai_type: PokeTeam.AI, criterion = None, criterion_value = None) -> None:
+    def __init__(self, team_name: str, team_numbers: list[int], battle_mode: int, ai_type: PokeTeam.AI, criterion=None,
+                 criterion_value=None) -> None:
         """
-        Constructor of the class that initializes the required instance variables. 
+        Constructor of the class that initializes the required instance variables.
 
         4 compulsory parameters:
         :parameter team_name: The team name of the PokeTeam
@@ -75,7 +79,7 @@ class PokeTeam:
         :time complexity: Best Case = Worst Case = O(1)
         """
         # Pre condition check for argument, team_name
-        if not(isinstance(team_name, str)):
+        if not (isinstance(team_name, str)):
             raise TypeError("team name should be in str type")
         else:
             self.team_name = team_name
@@ -85,7 +89,7 @@ class PokeTeam:
             raise ValueError("Total number of pokemons in a team must not exceed 6")
         else:
             self.team_numbers = team_numbers
-        
+
         # Pre condition check for argument, battle_mode
         # invalid battle_mode
         if battle_mode not in [0, 1, 2]:
@@ -102,25 +106,25 @@ class PokeTeam:
             elif self.battle_mode == 2:
                 # battle_mode 2 is handled by using ArraySortedList
                 self.team = ArraySortedList(self.TEAM_LIMIT)
-        
+
         # Pre condition check for argument, ai_type
-        if not(isinstance(ai_type, PokeTeam.AI)):
+        if not (isinstance(ai_type, PokeTeam.AI)):
             raise ValueError("ai_type must be an instance of PokeTeam.AI Enum")
         else:
             self.ai_mode = ai_type.name
 
         # Pre condition check for argument, criterion
         # if battle_mode = 2 and no criterion given
-        if self.battle_mode == 2 and not(isinstance(criterion, Criterion)):
+        if self.battle_mode == 2 and not (isinstance(criterion, Criterion)):
             raise ValueError("Battle mode 2 required a criterion")
         elif self.battle_mode == 2 and isinstance(criterion, Criterion):
             self.criterion = criterion.name
-            
+
         self.criterion_value = criterion_value
         self.heal_count = 0
         self.num_of_special = 0
         self.assign_team(self.battle_mode)
-    
+
     def get_criterion(self, criterion: Criterion, poke: PokemonBase) -> int:
         """
         Method that returns an integer which is either the speed, hp value, level and defence.
@@ -137,7 +141,7 @@ class PokeTeam:
             return poke.get_level()
         elif criterion == "DEF":
             return poke.get_defence()
-    
+
     def assign_team(self, battle_mode: int) -> None:
         """
         Method that used to assign pokemons in the team in correct order for each battle mode.
@@ -157,17 +161,18 @@ class PokeTeam:
             for i in range(len(self.team_numbers)):
                 for j in range(self.team_numbers[i]):
                     self.team.append(self.BASE_POKEMON[i]())
-    
+
         # The pokemon is added in the team by decreasing default by using the ArraySortedList.
         elif self.battle_mode == 2:
             for i in range(len(self.team_numbers)):
                 for j in range(self.team_numbers[i]):
-                    self.team.add(ListItem(self.BASE_POKEMON[i](), - self.get_criterion(self.criterion, self.BASE_POKEMON[i]())))
-            
+                    self.team.add(
+                        ListItem(self.BASE_POKEMON[i](), - self.get_criterion(self.criterion, self.BASE_POKEMON[i]())))
+
             # all pokemons have same base level
             if self.criterion == "LV":
                 self.tie_podekex_order(self.team)
-            
+
     def tie_podekex_order(self, list: ArraySortedList) -> None:
         """
         Method that used to sort the pokemons in pokedex order as they are having the same value for criterion.
@@ -187,8 +192,8 @@ class PokeTeam:
                     if isinstance(list[i].value, self.POKEDEX_ORDERING[j]):
                         # use the value of pokedex order as key to sort the team
                         temp_array_sorted_list.add(ListItem(list[i].value, j))
-        
-        # clear the pokemons                 
+
+        # clear the pokemons
         self.team.clear()
 
         # go through the temporary team
@@ -197,7 +202,7 @@ class PokeTeam:
             self.team.add(ListItem(temp_array_sorted_list[i].value, i))
 
     @classmethod
-    def random_team(cls, team_name: str, battle_mode: int, team_size = None, ai_mode = None, **kwargs) -> PokeTeam:
+    def random_team(cls, team_name: str, battle_mode: int, team_size=None, ai_mode=None, **kwargs) -> PokeTeam:
         """
         Method that used to create a random team by the team_name, battle_mode, team_size and ai_mode given.
 
@@ -210,13 +215,13 @@ class PokeTeam:
         :parameter ai_mode: The AI mode of the PokeTeam
 
         :**kwargs: This is used to pass a keyworded variable-length argument list, in this case it is for criterion.
-        
+
         :time complexity: Best Case = Worst Case = O(1)
         """
         # if no team_size given
         if team_size == None:
             team_size = RandomGen.randint(PokeTeam.TEAM_LIMIT // 2, PokeTeam.TEAM_LIMIT)
-        
+
         # create a ArraySortedList named sorted_list to help in getting the team_numbers
         sorted_list = ArraySortedList(PokeTeam.TEAM_LIMIT)
         sorted_list.add(ListItem(0, 0))
@@ -230,7 +235,7 @@ class PokeTeam:
         # use an inbuilt list to get all the numbers in int type to do calculation
         temp = []
         for i in range(len(sorted_list)):
-            num_of_each_pokemon = int(str(sorted_list[i]))
+            num_of_each_pokemon = sorted_list[i].value
             temp.append(num_of_each_pokemon)
 
         # use an inbuilt list to store the team_numbers
@@ -244,23 +249,27 @@ class PokeTeam:
 
         # get the criterion passed by **kwargs if battle_mode is 2
         if battle_mode == 2:
-            for key, value in kwargs.items():
+            for value in kwargs.values():
                 return PokeTeam(team_name, team_numbers, battle_mode, ai_mode, criterion=value)
         else:
             return PokeTeam(team_name, team_numbers, battle_mode, ai_mode)
-        
+
     def return_pokemon(self, poke: PokemonBase) -> None:
         """
         Method that used to return a pokemon to the team from the field.
 
         :parameter poke: Pokemon object to be returned
-        
+
         :time complexity: Best Case = Worst Case = O(1)
         """
         if self.team.is_full():
             raise Exception("The team is full and cannot return pokemon back")
         # fainted pokemon not returned bac to the team
         elif not poke.is_fainted():
+            poke.asleep == False
+            poke.confused == False
+            poke.halve_effective_attack == False
+            poke.paralyzed == False
             if self.battle_mode == 0:
                 self.team.push(poke)
             elif self.battle_mode == 1:
@@ -272,13 +281,13 @@ class PokeTeam:
                 # team in increasing order
                 else:
                     self.team.add(ListItem(poke, self.get_criterion(self.criterion, poke)))
-            
+
     def retrieve_pokemon(self) -> PokemonBase | None:
         """
         Method that used to retrieve a pokemon from the team to the field.
 
         :return: Pokemon object retrieved or None (if the team is empty)
-        
+
         :time complexity: Best Case = Worst Case = O(1)
         """
         if self.team.is_empty():
@@ -303,19 +312,22 @@ class PokeTeam:
         """
         # battle mode 0
         if self.battle_mode == 0:
+            team_length = len(self.team)
             after_special = ArrayStack(len(self.team))
-            # first pokemon
-            after_special.push(self.team.pop())
-            # pokemon between first pokemon and last pokemon
-            for i in range(1, len(self.team)):
-                after_special.push(self.team[i])
-            # last pokemon
-            after_special.push(self.team[0])
+            between = ArrayStack(team_length - 2)
 
-            self.team.clear()
-            for i in range(len(after_special)):
-                self.team.push(after_special[i])
-            
+            after_special.push(self.team.pop())
+
+            for i in range(team_length - 2):
+                between.push(self.team.pop())
+
+            for i in range(team_length - 2):
+                after_special.push(between.pop())
+
+            after_special.push(self.team.pop())
+
+            self.team = after_special
+
             self.num_of_special += 1
 
         # battle mode 1
@@ -339,12 +351,19 @@ class PokeTeam:
                         first_halve.append(self.team.serve())
                     else:
                         second_halve.append(self.team.serve())
-        
-            # swaps the first and second halves of the team and reverses the order of the first_halve
+
+            # swaps the first and second halves of the team
             for i in range(len(second_halve)):
-                self.team.append(second_halve[i])
-            for i in range(len(first_halve) - 1, -1, -1):
-                self.team.append(first_halve[i])
+                self.team.append(second_halve.serve())
+
+            # reverses the order of the first_halve
+            reversed_order = []
+            for i in range(len(first_halve)):
+                reversed_order.insert(0, first_halve.serve())
+
+            # add the reversed order
+            for i in range(len(reversed_order)):
+                self.team.append(reversed_order[i])
 
             self.num_of_special += 1
 
@@ -361,9 +380,9 @@ class PokeTeam:
             # add the pokemons into the team starting from the last pokemon in the team
             for i in range(len(reverse_team) - 1, -1, -1):
                 self.team.add(ListItem(reverse_team[i].value, - i))
-            
+
             self.num_of_special += 1
-    
+
     def regenerate_team(self) -> None:
         """
         Method that used to regenerate the team.
@@ -385,31 +404,30 @@ class PokeTeam:
 
         :return: The string to be printed with team_name, battle_mode and the pokemons with their level and hp
         """
-        empty_string = ""
-
-        # pokemons are pushed by reversing order into the team (ArrayStack) in battle mode 1
+        pokemon_list = []
         if self.battle_mode == 0:
-            # access the pokemon by reversing order
-            for i in range(len(self.team) - 1, -1, -1):
-                empty_string += str(self.team[i])
-                if i != 0:
-                    empty_string += ", "
+            for i in range(len(self.team)):
+                pokemon_list.append(str(self.team.pop()))
+
+        elif self.battle_mode == 1:
+            for i in range(len(self.team)):
+                pokemon_list.append(str(self.team.serve()))
+
         else:
             for i in range(len(self.team)):
-                empty_string += str(self.team[i])
-                if i != len(self.team) - 1:
-                    empty_string += ", "
+                pokemon_list.append(str(self.team.delete_at_index(0).value))
 
-        return "{0} ({1}): [{2}]".format(self.team_name, self.battle_mode, empty_string)
+        pokemon_list = ", ".join(pokemon_list)
+        return f"{self.team_name} ({self.battle_mode}): [{pokemon_list}]"
 
     def is_empty(self) -> bool:
         """
         Method that returns True if the caller team is empty, False otherwise.
-        
+
         :return: boolean value (True - team is empty, False - team is not empty)
         """
         return self.team.is_empty()
-    
+
     def choose_battle_option(self, my_pokemon: PokemonBase, their_pokemon: PokemonBase) -> Action:
         """
         Method that used to choose battle option of the team.
@@ -427,7 +445,8 @@ class PokeTeam:
         elif self.ai_mode == "SWAP_ON_SUPER_EFFECTIVE":
             attack_poke_type_index = PokeType[their_pokemon.get_poke_type()].value
             defend_poke_type_index = PokeType[my_pokemon.get_poke_type()].value
-            opposing_pokemon_effective_attack = their_pokemon.get_attack_damage() * ATTACK_MULTIPLIER[attack_poke_type_index][defend_poke_type_index]
+            opposing_pokemon_effective_attack = their_pokemon.get_attack_damage() * \
+                                                ATTACK_MULTIPLIER[attack_poke_type_index][defend_poke_type_index]
 
             if opposing_pokemon_effective_attack >= (1.5 * their_pokemon.get_attack_damage()):
                 return Action.SWAP
@@ -459,16 +478,16 @@ class PokeTeam:
                     user_input = int(input(user_input_prompt))
                     if user_input < 1 or user_input > len(actions):
                         raise ValueError
-                        
+
                 except ValueError:
                     print(invalid_type_input_prompt)
 
                 else:
                     action = actions[user_input - 1]
                     valid_input = True
-            
+
             return action
-    
+
     @classmethod
     def leaderboard_team(cls):
         raise NotImplementedError()
