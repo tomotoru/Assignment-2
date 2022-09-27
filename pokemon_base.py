@@ -101,9 +101,6 @@ class PokemonBase(ABC):
         self.level += 1
         self.hp = self.get_max_hp() - difference_of_hp
 
-        if self.paralysis:
-            self.speed = int(self.get_speed() / 2)
-
     @abstractmethod
     def get_speed(self) -> int:
         """
