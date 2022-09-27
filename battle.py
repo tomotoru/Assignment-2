@@ -7,7 +7,7 @@ from random_gen import RandomGen
 from battle import *
 from poke_team import *
 from pokemon import *
-from stack_adt import * 
+from stack_adt import *
 
 class Battle:
 
@@ -68,12 +68,12 @@ class Battle:
             the pokemon, else get the current speed of the pokemon. 
             """
             if team1_action == Action(1) and team2_action == Action(1):
-                if  team1_pokemon.is_paralysis():
+                if  team1_pokemon.is_paralyzed():
                     team1_pokemon_speed = int(team1_pokemon.get_speed() // 2)
                 else:
                     team1_pokemon_speed = team1_pokemon.get_speed()
 
-                if team2_pokemon.is_paralysis():
+                if team2_pokemon.is_paralyzed():
                     team2_pokemon_speed = int(team2_pokemon.get_speed() // 2)
                 else:
                     team2_pokemon_speed = team2_pokemon.get_speed()
@@ -167,3 +167,4 @@ class Battle:
                     else:
                         team1.return_pokemon(team1_pokemon)
                         team1_pokemon = team1.retrieve_pokemon()
+

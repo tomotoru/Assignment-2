@@ -10,7 +10,7 @@ class TestBattle(BaseTest):
         RandomGen.set_seed(1337)
         team1 = PokeTeam("Ash", [1, 1, 1, 0, 0], 0, PokeTeam.AI.ALWAYS_ATTACK)
         team2 = PokeTeam("Gary", [0, 0, 0, 0, 3], 0, PokeTeam.AI.ALWAYS_ATTACK)
-        b = Battle(verbosity=0)
+        b = Battle()
         res = b.battle(team1, team2)
         self.assertEqual(res, 1)
         self.assertTrue(team2.is_empty())
