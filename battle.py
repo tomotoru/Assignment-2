@@ -7,7 +7,7 @@ from random_gen import RandomGen
 from battle import *
 from poke_team import *
 from pokemon import *
-from stack_adt import * 
+from stack_adt import *
 
 class Battle:
 
@@ -20,159 +20,150 @@ class Battle:
         which represents draw, and 1 or 2 representing player 1 or 2 winning respectively
         """
         # Retrieve the pokemon from team1 and team2
-        team1pokemon = team1.retrieve_pokemon()
-        team2pokemon = team2.retrieve_pokemon()
+        team1_pokemon = team1.retrieve_pokemon()
+        team2_pokemon = team2.retrieve_pokemon()
 
         while True:
-            #print(team1pokemon, team2pokemon)
-            team1action = team1.choose_battle_option(team1pokemon, team2pokemon)
-            team2action = team2.choose_battle_option(team2pokemon, team1pokemon)
-            #print(team1action, team2action)
+
+            team1_action = team1.choose_battle_option(team1_pokemon, team2_pokemon)
+            team2_action = team2.choose_battle_option(team2_pokemon, team1_pokemon)
 
             # if ACTION = swap, return_pokemon and retrieve_pokemon
-            if team1action == Action(2):
-                team1.return_pokemon(team1pokemon)
-                team1pokemon = team1.retrieve_pokemon()
-
-            if team2action == Action(2):
-                team2.return_pokemon(team2pokemon)
-                team2pokemon = team2.retrieve_pokemon()
+            if team1_action == Action(2) or team2_action == Action(2):
+                if team1_action == Action(2):
+                    team1.return_pokemon(team1_pokemon)
+                    team1_pokemon = team1.retrieve_pokemon()
+                else:
+                    team2.return_pokemon(team2_pokemon)
+                    team2_pokemon = team2.retrieve_pokemon()
 
             # if ACTION = special, return_pokemon, special action (according to the battle mode) and retrieve_pokemon
-            if team1action == Action(4):
-                team1.return_pokemon(team1pokemon)
-                team1.special()
-                team1pokemon = team1.retrieve_pokemon()
-
-            if team2action == Action(4):
-                team2.return_pokemon(team2pokemon)
-                team2.special()
-                team2pokemon = team2.retrieve_pokemon()
+            if team1_action == Action(4) or team2_action == Action(4):
+                if team1_action == Action(4):
+                    team1.return_pokemon(team1_pokemon)
+                    team1.special()
+                    team1_pokemon = team1.retrieve_pokemon()
+                else:
+                    team2.return_pokemon(team2_pokemon)
+                    team2.special()
+                    team2_pokemon = team2.retrieve_pokemon()
 
             # if ACTION = heal, check if less than thrice, else return the pokemon back to the team and team2 wins
-            if team1action == Action(3):
-                if team1.heal_count <= 3:
-                    team1pokemon.heal()
+            if team1_action == Action(3) or team2_action == Action(3):
+                if team1_action == Action(3):
+                    if team1.heal_count >= team1.NUM_OF_HEALS:
+                        return 2
+                    else:
+                        team1.heal_count = team1.heal_count + 1
+                        team1_pokemon.heal()
                 else:
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 2
-
-            # if ACTION = heal, check if less than thrice, else return the pokemon back to the team and team1 wins
-            if team2action == Action(3):
-                if team2.heal_count <= 3:
-                    team2pokemon.heal()
-                else:
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 1
+                    if team2.heal_count >= team2.NUM_OF_HEALS:
+                        return 1
+                    else:
+                        team2.heal_count = team2.heal_count + 1
+                        team2_pokemon.heal()
 
             """
-            If ACTION = attack, check if the pokemon_status_effect is equal to "paralysis", if it is, halves the speed of
+            If ACTION = attack, check if the pokemon is inflicted with "paralysis", if it is, halves the speed of
             the pokemon, else get the current speed of the pokemon. 
             """
-            if team1action == Action(1) and team2action == Action(1):
-                if team1pokemon.status_effect == "PARALYSIS":
-                    team1pokemon_speed = int(team1pokemon.get_speed() // 2)
+            if team1_action == Action(1) and team2_action == Action(1):
+                if  team1_pokemon.is_paralyzed():
+                    team1_pokemon_speed = int(team1_pokemon.get_speed() // 2)
                 else:
-                    team1pokemon_speed = team1pokemon.get_speed()
+                    team1_pokemon_speed = team1_pokemon.get_speed()
 
-                if team2pokemon.status_effect == "PARALYSIS":
-                    team2pokemon_speed = int(team2pokemon.get_speed() // 2)
+                if team2_pokemon.is_paralyzed():
+                    team2_pokemon_speed = int(team2_pokemon.get_speed() // 2)
                 else:
-                    team2pokemon_speed = team2pokemon.get_speed()
+                    team2_pokemon_speed = team2_pokemon.get_speed()
 
-                # If team1pokemon_speed greater than team2pokemon_speed, team1pokemon attack team2pokemon, and if
-                # team2pokemon is not fainted, team2pokemon will attack team1pokemon
-                if team1pokemon_speed > team2pokemon_speed:
-                    team1pokemon.attack(team2pokemon)
-                    if not team2pokemon.is_fainted():
-                        team2pokemon.attack(team1pokemon)
+                # If team1_pokemon_speed greater than team2_pokemon_speed, team1_pokemon attack team2_pokemon, and if
+                # team2_pokemon is not fainted, team2_pokemon will attack team1_pokemon
+                if team1_pokemon_speed > team2_pokemon_speed:
+                    team1_pokemon.attack(team2_pokemon)
+                    if not team2_pokemon.is_fainted():
+                        team2_pokemon.attack(team1_pokemon)
 
-                # If team2pokemon_speed greater than team1pokemon_speed, team2pokemon attack team1pokemon, and if
-                # team1pokemon is not fainted, team1pokemon will attack team2pokemon
-                elif team2pokemon_speed > team1pokemon_speed:
-                    team2pokemon.attack(team1pokemon)
-                    if not team1pokemon.is_fainted():
-                        team1pokemon.attack(team2pokemon)
+                # If team2_pokemon_speed greater than team1_pokemon_speed, team2_pokemon attack team1_pokemon, and if
+                # team1_pokemon is not fainted, team1_pokemon will attack team2_pokemon
+                elif team2_pokemon_speed > team1_pokemon_speed:
+                    team2_pokemon.attack(team1_pokemon)
+                    if not team1_pokemon.is_fainted():
+                        team1_pokemon.attack(team2_pokemon)
 
-                # If team1pokemon_speed equals to team2pokemon_speed, team1pokemon attack team2pokemon, and
-                # team2pokemon will attack team1pokemon
-                elif team1pokemon_speed == team2pokemon_speed:
-                    team1pokemon.attack(team2pokemon)
-                    team2pokemon.attack(team1pokemon)
+                # If team1_pokemon_speed equals to team2_pokemon_speed, team1_pokemon attack team2_pokemon, and
+                # team2_pokemon will attack team1_pokemon
+                elif team1_pokemon_speed == team2_pokemon_speed:
+                    team1_pokemon.attack(team2_pokemon)
+                    team2_pokemon.attack(team1_pokemon)
 
-            elif team1action == Action(1):
-                team1pokemon.attack(team2pokemon)
+            elif team1_action == Action(1):
+                team1_pokemon.attack(team2_pokemon)
 
-            elif team2action == Action(1):
-                team2pokemon.attack(team1pokemon)
+            elif team2_action == Action(1):
+                team2_pokemon.attack(team1_pokemon)
 
             # print("Pokemon1 fainted", team1pokemon.is_fainted())
             # print("Pokemon2 fainted", team2pokemon.is_fainted())
 
             # if both pokemon still alive, -1 HP
-            if not team1pokemon.is_fainted() and not team2pokemon.is_fainted():
-                team1pokemon.lose_hp(1)
-                team2pokemon.lose_hp(1)
+            if not team1_pokemon.is_fainted() and not team2_pokemon.is_fainted():
+                team1_pokemon.lose_hp(1)
+                team2_pokemon.lose_hp(1)
 
             # check is_fainted for one of the pokemons, the other pokemon will level up (update HP)
-            if team1pokemon.is_fainted() and not team2pokemon.is_fainted():
-                team2pokemon.level_up()
+            if not team1_pokemon.is_fainted() and team2_pokemon.is_fainted():
+                team1_pokemon.level_up()
 
-            elif team2pokemon.is_fainted() and not team1pokemon.is_fainted():
-                team1pokemon.level_up()
+            elif not team2_pokemon.is_fainted() and team1_pokemon.is_fainted():
+                team2_pokemon.level_up()
 
-            if team2pokemon.should_evolve():
-                team2pokemon = team2pokemon.get_evolved_version()
+            # check if pokemon have not fainted and can evolve, they evolve
+            if not team1_pokemon.is_fainted() and not team2_pokemon.is_fainted():
+                if team1_pokemon.should_evolve():
+                    team1_pokemon = team1_pokemon.get_evolved_version()
 
-            if team1pokemon.should_evolve():
-                team1pokemon = team1pokemon.get_evolved_version()
+                if team2_pokemon.should_evolve():
+                    team2_pokemon = team2_pokemon.get_evolved_version()
 
-            #print(team1pokemon,team2pokemon)
+            # Fainted pokemon are returned and a new pokemon is retrieved from the team.
+            # If no pokemon can be retrieved (the team is empty), then the opposing player
+            # wins. If both teams are empty, the result is a draw it will return 0
+            if team1_pokemon.is_fainted() or team2_pokemon.is_fainted():
 
-            # if team1pokemon faint and team2pokemon faint, if both team is empty, return the pokemons back to their
-            # own team and this battle result 0 which is draw
-            if team1pokemon.is_fainted() and team2pokemon.is_fainted():
-                if team1.is_empty() and team2.is_empty():
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 0
+                # if both pokemon is fainted then team which is empty will lose else
+                # fainted pokemon will be returned and new pokemon will be retrived
+                if team1_pokemon.is_fainted() and team2_pokemon.is_fainted():
+                    if team1.is_empty() and team2.is_empty():
+                        team1.return_pokemon(team1_pokemon)
+                        team2.return_pokemon(team2_pokemon)
+                        return 0
+                    elif not team1.is_empty() and team2.is_empty():
+                        team1.return_pokemon(team1_pokemon)
+                        team2.return_pokemon(team2_pokemon)
+                        return 1
+                    elif team1.is_empty() and not team2.is_empty():
+                        team1.return_pokemon(team1_pokemon)
+                        team2.return_pokemon(team2_pokemon)
+                        return 2
+                    else:
+                        team1.return_pokemon(team1_pokemon)
+                        team2.return_pokemon(team2_pokemon)
+                        team1_pokemon = team1.retrieve_pokemon()
+                        team2_pokemon = team2.retrieve_pokemon()
 
-                # if team1 is not empty and team2 is empty, return the pokemons back to their
-                # own team and this battle result 1 which won by player 1
-                elif not team1.is_empty() and team2.is_empty():
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 1
-
-                # if team1 is empty and team2 is not empty, return the pokemons back to their
-                # own team and this battle result 2 which won by player 2
-                elif team1.is_empty() and not team2.is_empty():
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 2
-
-            # if team1pokemon faint, if team1 is empty, return the pokemons back to their
-            # own team and this battle result 2 which won by player 2 else if team1 is not empty, retrieve
-            # another pokemon from the team
-            elif team1pokemon.is_fainted():
-                if team1.is_empty():
-                    team1.return_pokemon(team1pokemon)
-                    team2.return_pokemon(team2pokemon)
-                    return 2
+                elif not team1_pokemon.is_fainted() and team2_pokemon.is_fainted():
+                    if team2.is_empty():
+                        team2.return_pokemon(team2_pokemon)
+                        return 1
+                    else:
+                        team2.return_pokemon(team2_pokemon)
+                        team2_pokemon = team2.retrieve_pokemon()
                 else:
-                    team1pokemon = team1.retrieve_pokemon()
-
-            # if team2pokemon faint, if team2 is empty, return the pokemons back to their
-            # own team and this battle result 1 which won by player 1 else if team2 is not empty, retrieve
-            # another pokemon from the team
-            elif team2pokemon.is_fainted():
-                if team2.is_empty():
-                    team2.return_pokemon(team2pokemon)
-                    team1.return_pokemon(team1pokemon)
-                    return 1
-                else:
-                    team2pokemon = team2.retrieve_pokemon()
-
-            print(team1pokemon,team2pokemon)
+                    if team1.is_empty():
+                        team1.return_pokemon(team1_pokemon)
+                        return 2
+                    else:
+                        team1.return_pokemon(team1_pokemon)
+                        team1_pokemon = team1.retrieve_pokemon()
