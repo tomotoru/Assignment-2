@@ -65,7 +65,7 @@ class BattleTower:
         self.team.regenerate_team()
         tower_team.regenerate_team()
 
-        battle_result = self.battle(self.team, tower_team_obj.tower_team)
+        battle_result = self.battle.battle(self.team, tower_team_obj.tower_team)
 
         if battle_result == 2:
             raise StopIteration
