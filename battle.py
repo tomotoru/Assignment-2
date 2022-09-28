@@ -167,3 +167,4 @@ class Battle:
                     else:
                         team1.return_pokemon(team1_pokemon)
                         team1_pokemon = team1.retrieve_pokemon()
+
