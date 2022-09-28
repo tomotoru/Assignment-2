@@ -11,7 +11,7 @@ from stack_adt import *
 
 class Battle:
 
-    def init(self, verbosity=0) -> None:
+    def __init__(self, verbosity=0) -> None:
         self.verbosity = verbosity
 
     def battle(self, team1: PokeTeam, team2: PokeTeam) -> int:
